@@ -1,26 +1,26 @@
 use std::{borrow::Cow, fmt::Display};
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct TagScript<'a> {
+pub struct Script<'a> {
     // TODO
     // tag:
     contents: Cow<'a, str>,
 }
 
-impl Display for TagScript<'_> {
+impl Display for Script<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "<script>\n{}\n</script>", self.contents)
     }
 }
-impl<'a> TagScript<'a> {
-    pub fn new<S: AsRef<str>>(script: S) -> TagScript<'a> {
+impl<'a> Script<'a> {
+    pub fn new<S: AsRef<str>>(script: S) -> Script<'a> {
         Self {
             contents: Cow::from(script.as_ref().to_owned()),
         }
     }
 }
 
-impl From<String> for TagScript<'_> {
+impl From<String> for Script<'_> {
     fn from(value: String) -> Self {
         Self {
             contents: value.into(),
@@ -28,8 +28,8 @@ impl From<String> for TagScript<'_> {
     }
 }
 
-pub fn script<'a, S: AsRef<str>>(script: S) -> TagScript<'a> {
-    TagScript::new(script)
+pub fn script<'a, S: AsRef<str>>(script: S) -> Script<'a> {
+    Script::new(script)
 }
 
 #[cfg(test)]

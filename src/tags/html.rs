@@ -1,19 +1,19 @@
 use std::fmt::Display;
 
-use super::{body::TagBody, head::TagHeadLike, script::TagScript, style::TagStyle};
+use super::{body::Body, head::HeadItem, script::Script, style::Style};
 
-pub fn html<'a>() -> TagHtml<'a> {
-    TagHtml::new()
+pub fn html<'a>() -> Html<'a> {
+    Html::new()
 }
 
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct TagHtml<'a> {
-    head: Vec<TagHeadLike<'a>>,
-    styles: Vec<TagStyle<'a>>,
-    scripts: Vec<TagScript<'a>>,
-    body: Option<TagBody<'a>>,
+pub struct Html<'a> {
+    head: Vec<HeadItem<'a>>,
+    styles: Vec<Style<'a>>,
+    scripts: Vec<Script<'a>>,
+    body: Option<Body<'a>>,
 }
-impl Display for TagHtml<'_> {
+impl Display for Html<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let head = {
             let mut inner = "<head>".to_owned();
@@ -29,7 +29,6 @@ impl Display for TagHtml<'_> {
             for style in &self.styles {
                 inner.push_str(format!("\n{}", style).as_str())
             }
-            inner.push_str("\n");
             inner
         };
 
@@ -50,45 +49,45 @@ impl Display for TagHtml<'_> {
 
         write!(
             f,
-            "<!doctype html>\n<html>\n{head}\n{styles}\n{scripts}\n{body}\n</html>"
+            "<!doctype html>\n<html>\n{head}{styles}{scripts}{body}\n</html>"
         )
     }
 }
 
-impl<'a> TagHtml<'a> {
-    pub fn new() -> TagHtml<'a> {
+impl<'a> Html<'a> {
+    pub fn new() -> Html<'a> {
         Default::default()
     }
-    pub fn head(mut self, head: TagHeadLike<'a>) -> TagHtml<'a> {
+    pub fn head(mut self, head: HeadItem<'a>) -> Html<'a> {
         self.head.push(head);
-        TagHtml {
+        Html {
             head: self.head,
             styles: self.styles,
             scripts: self.scripts,
             body: self.body,
         }
     }
-    pub fn add_style(mut self, style: TagStyle<'a>) -> TagHtml<'a> {
+    pub fn add_style(mut self, style: Style<'a>) -> Html<'a> {
         self.styles.push(style);
-        TagHtml {
+        Html {
             head: self.head,
             styles: self.styles,
             scripts: self.scripts,
             body: self.body,
         }
     }
-    pub fn add_script(mut self, script: TagScript<'a>) -> TagHtml<'a> {
+    pub fn add_script(mut self, script: Script<'a>) -> Html<'a> {
         self.scripts.push(script);
-        TagHtml {
+        Html {
             head: self.head,
             styles: self.styles,
             scripts: self.scripts,
             body: self.body,
         }
     }
-    pub fn body(mut self, body: TagBody<'a>) -> TagHtml<'a> {
+    pub fn body(mut self, body: Body<'a>) -> Html<'a> {
         self.body = Some(body);
-        TagHtml {
+        Html {
             head: self.head,
             styles: self.styles,
             scripts: self.scripts,
@@ -109,9 +108,9 @@ mod tests {
 
     #[test]
     fn ok_on_build_html() {
-        let title = TagHeadLike::new("<title>It works!</title>");
-        let style = TagStyle::new("body { color: #000000; }");
-        let script1 = TagScript::new(
+        let title = HeadItem::new("<title>It works!</title>");
+        let style = Style::new("body { color: #000000; }");
+        let script1 = Script::new(
             format!(
                 r#"console.log("Hello from file {} at line {}")"#,
                 file!(),
@@ -120,8 +119,8 @@ mod tests {
             .as_str(),
         );
 
-        let body = TagBody::new().script(script1);
-        let script2 = TagScript::new(
+        let body = Body::new().script(script1);
+        let script2 = Script::new(
             format!(
                 r#"console.log("Hello from file {} at line {}")"#,
                 file!(),

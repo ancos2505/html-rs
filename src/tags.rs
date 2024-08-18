@@ -6,12 +6,20 @@ mod html;
 mod script;
 mod style;
 
+pub use self::{
+    body::Body,
+    head::{Head, HeadItem},
+    html::Html,
+    script::Script,
+    style::Style,
+};
+
 #[derive(Debug, PartialEq, Eq)]
-pub struct HtmlTag<'a> {
+pub struct Tag<'a> {
     pub name: Cow<'a, str>,
-    pub attrs: Vec<HtmlAttribute<'a>>,
+    pub attrs: Vec<TagAttribute<'a>>,
 }
-impl Display for HtmlTag<'_> {
+impl Display for Tag<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut output = format!("{} ", self.name);
         let max_idx = self.attrs.len();
@@ -24,28 +32,28 @@ impl Display for HtmlTag<'_> {
         write!(f, "{output}")
     }
 }
-impl HtmlTag<'_> {
+impl Tag<'_> {
     pub fn set_attr<K: AsRef<str>, V: AsRef<str>>(&mut self, key: K, value: V) {
-        let attr = HtmlAttribute::from((key.as_ref().to_owned(), value.as_ref().to_owned()));
+        let attr = TagAttribute::from((key.as_ref().to_owned(), value.as_ref().to_owned()));
         self.attrs.push(attr);
     }
 }
 #[derive(Debug, PartialEq, Eq)]
-pub struct HtmlAttribute<'a> {
+pub struct TagAttribute<'a> {
     // TODO
     pub name: Cow<'a, str>,
     pub value: String,
 }
-impl Display for HtmlAttribute<'_> {
+impl Display for TagAttribute<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let output = format!("{}={}", self.name, self.value);
         write!(f, "{output}")
     }
 }
 
-impl From<(String, String)> for HtmlAttribute<'_> {
+impl From<(String, String)> for TagAttribute<'_> {
     fn from((key, value): (String, String)) -> Self {
-        HtmlAttribute {
+        TagAttribute {
             name: key.into(),
             value,
         }

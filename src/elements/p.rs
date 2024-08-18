@@ -1,4 +1,4 @@
-use crate::tags::HtmlTag;
+use crate::tags::Tag;
 
 use super::HtmlElement;
 
@@ -12,7 +12,7 @@ impl P {
 }
 impl<'a> P {
     pub fn builder() -> HtmlElement<'a> {
-        let tag = HtmlTag {
+        let tag = Tag {
             name: Self::as_str().into(),
             attrs: Default::default(),
         };

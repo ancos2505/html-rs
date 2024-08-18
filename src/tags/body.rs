@@ -2,17 +2,17 @@ use std::fmt::Display;
 
 use crate::elements::HtmlElement;
 
-use super::script::TagScript;
+use super::script::Script;
 
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct TagBody<'a> {
+pub struct Body<'a> {
     // TODO
     // tag:
     contents: Vec<HtmlElement<'a>>,
-    script: Vec<TagScript<'a>>,
+    script: Vec<Script<'a>>,
 }
 
-impl Display for TagBody<'_> {
+impl Display for Body<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // TODO
         // tag:
@@ -23,30 +23,30 @@ impl Display for TagBody<'_> {
         for script in &self.script {
             output.push_str(format!("\n{}", script).as_str());
         }
-        output.push_str("</body>");
+        output.push_str("\n</body>");
 
         write!(f, "{output}")
     }
 }
 
-pub fn body<'a>() -> TagBody<'a> {
-    TagBody::new()
+pub fn body<'a>() -> Body<'a> {
+    Body::new()
 }
 
-impl<'a> TagBody<'a> {
-    pub fn new() -> TagBody<'a> {
+impl<'a> Body<'a> {
+    pub fn new() -> Body<'a> {
         Default::default()
     }
-    pub fn script(mut self, script: TagScript<'a>) -> TagBody<'a> {
+    pub fn script(mut self, script: Script<'a>) -> Body<'a> {
         self.script.push(script);
-        TagBody {
+        Body {
             script: self.script,
             contents: self.contents,
         }
     }
-    pub fn contents(mut self, element: HtmlElement<'a>) -> TagBody<'a> {
+    pub fn contents(mut self, element: HtmlElement<'a>) -> Body<'a> {
         self.contents.push(element);
-        TagBody {
+        Body {
             script: self.script,
             contents: self.contents,
         }

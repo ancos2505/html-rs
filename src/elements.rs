@@ -7,9 +7,9 @@ use std::{
     fmt::{Debug, Display},
 };
 
-use text::TextContent;
+pub use self::{div::Div, p::P, text::TextContent};
 
-use crate::tags::HtmlTag;
+use crate::tags::Tag;
 
 pub trait ElementName: Debug {}
 
@@ -37,7 +37,7 @@ impl Display for HtmlElementChildren<'_> {
 
 #[derive(Debug)]
 pub struct HtmlElement<'a> {
-    tag: HtmlTag<'a>,
+    tag: Tag<'a>,
     depth: usize,
     children: Option<HtmlElementChildren<'a>>,
 }
@@ -67,7 +67,7 @@ impl PartialEq for HtmlElement<'_> {
 
 impl Eq for HtmlElement<'_> {}
 impl<'a> HtmlElement<'a> {
-    pub fn builder(tag: HtmlTag<'a>) -> HtmlElement<'a> {
+    pub fn builder(tag: Tag<'a>) -> HtmlElement<'a> {
         HtmlElement {
             tag,
             depth: 1,

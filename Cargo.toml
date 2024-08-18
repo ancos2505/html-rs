@@ -2,7 +2,7 @@
 edition = "2021"
 rust-version = "1.80.1"
 name = "html-rs"
-version = "0.1.0"
+version = "0.1.1"
 description = "Generate HTML code using Rust builders"
 readme = "README.md"
 keywords = ["html"]
@@ -18,6 +18,11 @@ repository = "https://github.com/ancos2505/html-rs"
 
 
 [dependencies]
+
+
+[features]
+default = []
+debug = []
 
 [lints.rust]
 unsafe-code = "forbid"
