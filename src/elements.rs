@@ -9,7 +9,7 @@ use std::{
 
 pub use self::{div::Div, p::P, text::TextContent};
 
-use crate::tags::Tag;
+use crate::{tags::Tag, OUTPUT_IDENTATION};
 
 pub trait ElementName: Debug {}
 
@@ -31,27 +31,39 @@ impl Display for HtmlElementChildren<'_> {
                 output.into()
             }
         };
+
         write!(f, "{output}")
     }
 }
 
 #[derive(Debug)]
 pub struct HtmlElement<'a> {
-    tag: Tag<'a>,
+    pub tag: Tag<'a>,
     depth: usize,
-    children: Option<HtmlElementChildren<'a>>,
+    pub children: Option<HtmlElementChildren<'a>>,
 }
 
 impl Display for HtmlElement<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut output = "".to_owned();
+        let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
+
         let tagname_and_attrs = format!("{}", self.tag);
         let tag_name = &self.tag.name;
 
-        let output = match &self.children {
+        match &self.children {
             Some(children) => {
-                format!("<{tagname_and_attrs}>{children}</{tag_name}>")
+                if let HtmlElementChildren::TextContent(s) = children {
+                    let text_iden = " ".repeat(OUTPUT_IDENTATION * (self.depth + 1));
+                    output.push_str(format!("\n{text_iden}{s}").as_str())
+                } else {
+                    output.push_str(
+                        format!("\n{iden}<{tagname_and_attrs}>{children}\n{iden}</{tag_name}>")
+                            .as_str(),
+                    )
+                }
             }
-            None => format!("<{tagname_and_attrs}></{tag_name}>"),
+            None => output.push_str(format!("\n{iden}<{tagname_and_attrs}></{tag_name}>").as_str()),
         };
 
         write!(f, "{output}")
@@ -70,7 +82,8 @@ impl<'a> HtmlElement<'a> {
     pub fn builder(tag: Tag<'a>) -> HtmlElement<'a> {
         HtmlElement {
             tag,
-            depth: 1,
+            // It exists from Body(depth=2)
+            depth: 2,
             children: Default::default(),
         }
     }
@@ -82,7 +95,7 @@ impl<'a> HtmlElement<'a> {
         HtmlElement {
             tag: self.tag,
             depth: self.depth,
-            children: Default::default(),
+            children: self.children,
         }
     }
     pub fn attr<K: AsRef<str>, V: AsRef<str>>(mut self, key: K, value: V) -> HtmlElement<'a> {
@@ -94,16 +107,17 @@ impl<'a> HtmlElement<'a> {
             children: self.children,
         }
     }
-    pub fn contents(mut self, mut element: HtmlElement<'a>) -> HtmlElement<'a> {
-        element.depth = self.depth + 1;
+    pub fn append_child(self, mut new_element: HtmlElement<'a>) -> HtmlElement<'a> {
+        new_element.depth = self.depth + 1;
+        dbg!(&new_element);
         if let Some(children) = self.children {
             let new_children = match children {
                 HtmlElementChildren::TextContent(text) => {
                     let migrated = TextContent::text(text);
-                    HtmlElementChildren::Children(vec![migrated, element])
+                    HtmlElementChildren::Children(vec![migrated, new_element])
                 }
                 HtmlElementChildren::Children(mut html_elements) => {
-                    html_elements.push(element);
+                    html_elements.push(new_element);
                     HtmlElementChildren::Children(html_elements)
                 }
             };
@@ -116,9 +130,17 @@ impl<'a> HtmlElement<'a> {
             HtmlElement {
                 tag: self.tag,
                 depth: self.depth,
-                children: Some(HtmlElementChildren::Children(vec![element])),
+                children: Some(HtmlElementChildren::Children(vec![new_element])),
             }
         }
+    }
+
+    pub fn depth(&self) -> usize {
+        self.depth
+    }
+
+    pub fn set_depth(&mut self, depth: usize) {
+        self.depth = depth;
     }
 }
 
@@ -130,13 +152,12 @@ mod tests {
     use crate::elements::{div::Div, p::P};
     #[test]
     fn ok_on_build_div_with_paragraph() {
-        // <div id="" class=""><div></div></div>
-        let div = Div::builder().attr("class", "light-theme").contents(
+        let div = Div::builder().attr("class", "light-theme").append_child(
             P::builder()
                 .attr("class", "light-theme")
-                .contents(TextContent::text("It Works!")),
+                .append_child(TextContent::text("It Works!")),
         );
-        //dbg!(&div);
+
         println!("{div}");
     }
 }

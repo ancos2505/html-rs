@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::{body::Body, head::HeadItem, script::Script, style::Style};
+use super::{body::Body, head::HeadItem, script::Script, style::Style, Head};
 
 pub fn html<'a>() -> Html<'a> {
     Html::new()
@@ -8,26 +8,19 @@ pub fn html<'a>() -> Html<'a> {
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct Html<'a> {
-    head: Vec<HeadItem<'a>>,
+    head: Head<'a>,
     styles: Vec<Style<'a>>,
     scripts: Vec<Script<'a>>,
     body: Option<Body<'a>>,
 }
 impl Display for Html<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let head = {
-            let mut inner = "<head>".to_owned();
-            for head in &self.head {
-                inner.push_str(format!("\n{}", head).as_str())
-            }
-            inner.push_str("\n</head>");
-            inner
-        };
+        let head = format!("{}", self.head);
 
         let styles = {
             let mut inner = "".to_owned();
             for style in &self.styles {
-                inner.push_str(format!("\n{}", style).as_str())
+                inner.push_str(format!("{}", style).as_str())
             }
             inner
         };
@@ -35,9 +28,8 @@ impl Display for Html<'_> {
         let scripts = {
             let mut inner = "".to_owned();
             for script in &self.scripts {
-                inner.push_str(format!("\n{}", script).as_str())
+                inner.push_str(format!("{}", script).as_str())
             }
-            inner.push_str("\n");
             inner
         };
 
@@ -46,11 +38,16 @@ impl Display for Html<'_> {
             .as_ref()
             .map(|body| body.to_string())
             .unwrap_or("".into());
-
-        write!(
-            f,
-            "<!doctype html>\n<html>\n{head}{styles}{scripts}{body}\n</html>"
-        )
+        let mut output = "".to_string();
+        let open_html = "<!doctype html>\n<html>";
+        output.push_str(open_html);
+        output.push_str(&head);
+        output.push_str(&styles);
+        output.push_str(&scripts);
+        output.push_str(&body);
+        let close_html = "\n<html>";
+        output.push_str(&close_html);
+        write!(f, "{output}")
     }
 }
 
@@ -59,7 +56,7 @@ impl<'a> Html<'a> {
         Default::default()
     }
     pub fn head(mut self, head: HeadItem<'a>) -> Html<'a> {
-        self.head.push(head);
+        self.head.items.push(head);
         Html {
             head: self.head,
             styles: self.styles,
@@ -95,7 +92,7 @@ impl<'a> Html<'a> {
         }
     }
     pub fn is_complete(&self) -> bool {
-        self.head.first().is_some()
+        self.head.items.first().is_some()
             && self.styles.first().is_some()
             && self.scripts.first().is_some()
             && self.body.is_some()

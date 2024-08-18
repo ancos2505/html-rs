@@ -1,29 +1,41 @@
 use std::{borrow::Cow, fmt::Display};
 
+use crate::OUTPUT_IDENTATION;
+
+use super::Tag;
+
 #[derive(Debug, PartialEq, Eq)]
 pub struct Script<'a> {
-    // TODO
-    // tag:
+    tag: Tag<'a>,
+    depth: usize,
     contents: Cow<'a, str>,
 }
 
 impl Display for Script<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "<script>\n{}\n</script>", self.contents)
-    }
-}
-impl<'a> Script<'a> {
-    pub fn new<S: AsRef<str>>(script: S) -> Script<'a> {
-        Self {
-            contents: Cow::from(script.as_ref().to_owned()),
-        }
+        let mut output = "".to_owned();
+        let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
+        output.push_str(format!("\n{iden}<{}>\n", self.tag).as_str());
+
+        output.push_str(&self.contents);
+
+        output.push_str(format!("\n{iden}</{}>", self.tag.name).as_str());
+        write!(f, "{output}")
     }
 }
 
-impl From<String> for Script<'_> {
-    fn from(value: String) -> Self {
+impl<'a> Script<'a> {
+    pub const fn as_str() -> &'static str {
+        "script"
+    }
+    pub fn new<S: AsRef<str>>(script: S) -> Script<'a> {
         Self {
-            contents: value.into(),
+            tag: Tag {
+                name: Self::as_str().into(),
+                attrs: Default::default(),
+            },
+            depth: 1,
+            contents: Cow::from(script.as_ref().to_owned()),
         }
     }
 }
@@ -38,14 +50,7 @@ mod tests {
 
     #[test]
     fn ok_on_build_simple_script() {
-        let script = script(
-            format!(
-                r#"console.log("Hello from file {} at line {}")"#,
-                file!(),
-                line!(),
-            )
-            .as_str(),
-        );
+        let script = script("body { color: #000000; }");
         //dbg!(&script);
         println!("{script}");
     }

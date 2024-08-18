@@ -1,4 +1,7 @@
-use html_rs::{Body, HeadItem, Html, Script, Style};
+use html_rs::{
+    elements::{Div, TextContent, P},
+    Body, HeadItem, Html, Script, Style,
+};
 
 fn main() {
     let title = HeadItem::new("<title>It works!</title>");
@@ -12,7 +15,14 @@ fn main() {
         .as_str(),
     );
 
-    let body = Body::new().script(script1);
+    let div = Div::builder().attr("class", "light-theme").append_child(
+        P::builder()
+            .attr("class", "light-theme")
+            .append_child(TextContent::text("It Works!")),
+    );
+
+    let body = Body::new().script(script1).append_child(div);
+
     let script2 = Script::new(
         format!(
             r#"console.log("Hello from file {} at line {}")"#,

@@ -1,30 +1,40 @@
 use std::fmt::Display;
 
-use crate::elements::HtmlElement;
+use crate::{elements::HtmlElement, OUTPUT_IDENTATION};
 
-use super::script::Script;
+use super::{script::Script, Tag};
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Body<'a> {
-    // TODO
-    // tag:
-    contents: Vec<HtmlElement<'a>>,
+    tag: Tag<'a>,
+    depth: usize,
+    elements: Vec<HtmlElement<'a>>,
     script: Vec<Script<'a>>,
+}
+
+impl Default for Body<'_> {
+    fn default() -> Self {
+        Self {
+            tag: Tag {
+                name: Self::as_str().into(),
+                attrs: Default::default(),
+            },
+            depth: 1,
+            elements: Default::default(),
+            script: Default::default(),
+        }
+    }
 }
 
 impl Display for Body<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // TODO
-        // tag:
-        let mut output = "<body>".to_owned();
-        for element in &self.contents {
-            output.push_str(format!("\n{}", element).as_str());
+        let mut output = "".to_owned();
+        let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
+        output.push_str(format!("\n{iden}<{}>", self.tag).as_str());
+        for elem in &self.elements {
+            output.push_str(format!("{iden}{}", elem).as_str());
         }
-        for script in &self.script {
-            output.push_str(format!("\n{}", script).as_str());
-        }
-        output.push_str("\n</body>");
-
+        output.push_str(format!("\n{iden}</{}>", self.tag.name).as_str());
         write!(f, "{output}")
     }
 }
@@ -34,21 +44,29 @@ pub fn body<'a>() -> Body<'a> {
 }
 
 impl<'a> Body<'a> {
+    pub const fn as_str() -> &'static str {
+        "body"
+    }
     pub fn new() -> Body<'a> {
         Default::default()
     }
     pub fn script(mut self, script: Script<'a>) -> Body<'a> {
         self.script.push(script);
         Body {
+            tag: self.tag,
+            depth: self.depth,
             script: self.script,
-            contents: self.contents,
+            elements: self.elements,
         }
     }
-    pub fn contents(mut self, element: HtmlElement<'a>) -> Body<'a> {
-        self.contents.push(element);
+    pub fn append_child(mut self, mut element: HtmlElement<'a>) -> Body<'a> {
+        element.set_depth(self.depth + 1);
+        self.elements.push(element);
         Body {
+            tag: self.tag,
+            depth: self.depth,
             script: self.script,
-            contents: self.contents,
+            elements: self.elements,
         }
     }
 }
@@ -60,11 +78,11 @@ mod tests {
     #[test]
     fn ok_on_build_simple_body() {
         let body = body().script(
-            format!(
+            Script::new(format!(
                 r#"console.log("Hello from file {} at line {}")"#,
                 file!(),
                 line!(),
-            )
+            ))
             .into(),
         );
         //dbg!(&body);

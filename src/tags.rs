@@ -1,10 +1,10 @@
-use std::{borrow::Cow, fmt::Display};
-
 mod body;
 mod head;
 mod html;
 mod script;
 mod style;
+
+use std::{borrow::Cow, fmt::Display};
 
 pub use self::{
     body::Body,
@@ -21,11 +21,14 @@ pub struct Tag<'a> {
 }
 impl Display for Tag<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut output = format!("{} ", self.name);
+        let mut output = format!("{}", self.name);
         let max_idx = self.attrs.len();
+        if max_idx > 0 {
+            output.push(' ');
+        }
         for (idx, attr) in self.attrs.iter().enumerate() {
             output.push_str(format!("{attr}").as_str());
-            if idx < max_idx {
+            if idx + 1 < max_idx {
                 output.push(' ')
             }
         }
@@ -46,7 +49,7 @@ pub struct TagAttribute<'a> {
 }
 impl Display for TagAttribute<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let output = format!("{}={}", self.name, self.value);
+        let output = format!(r#"{}="{}""#, self.name, self.value);
         write!(f, "{output}")
     }
 }
@@ -62,7 +65,7 @@ impl From<(String, String)> for TagAttribute<'_> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
 
     #[test]
     #[ignore = "Todo"]
