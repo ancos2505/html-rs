@@ -1,6 +1,11 @@
 use std::fmt::Display;
 
-use super::{body::Body, head::HeadItem, script::Script, style::Style, Head};
+use super::{
+    body::HtmlBody,
+    head::{HtmlHead, HtmlHeadItem},
+    script::HtmlScript,
+    style::HtmlStyle,
+};
 
 pub fn html<'a>() -> Html<'a> {
     Html::new()
@@ -8,10 +13,10 @@ pub fn html<'a>() -> Html<'a> {
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct Html<'a> {
-    head: Head<'a>,
-    styles: Vec<Style<'a>>,
-    scripts: Vec<Script<'a>>,
-    body: Option<Body<'a>>,
+    head: HtmlHead<'a>,
+    styles: Vec<HtmlStyle<'a>>,
+    scripts: Vec<HtmlScript<'a>>,
+    body: Option<HtmlBody<'a>>,
 }
 impl Display for Html<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -55,7 +60,7 @@ impl<'a> Html<'a> {
     pub fn new() -> Html<'a> {
         Default::default()
     }
-    pub fn head(mut self, head: HeadItem<'a>) -> Html<'a> {
+    pub fn head(mut self, head: HtmlHeadItem<'a>) -> Html<'a> {
         self.head.items.push(head);
         Html {
             head: self.head,
@@ -64,7 +69,7 @@ impl<'a> Html<'a> {
             body: self.body,
         }
     }
-    pub fn add_style(mut self, style: Style<'a>) -> Html<'a> {
+    pub fn add_style(mut self, style: HtmlStyle<'a>) -> Html<'a> {
         self.styles.push(style);
         Html {
             head: self.head,
@@ -73,7 +78,7 @@ impl<'a> Html<'a> {
             body: self.body,
         }
     }
-    pub fn add_script(mut self, script: Script<'a>) -> Html<'a> {
+    pub fn add_script(mut self, script: HtmlScript<'a>) -> Html<'a> {
         self.scripts.push(script);
         Html {
             head: self.head,
@@ -82,7 +87,7 @@ impl<'a> Html<'a> {
             body: self.body,
         }
     }
-    pub fn body(mut self, body: Body<'a>) -> Html<'a> {
+    pub fn body(mut self, body: HtmlBody<'a>) -> Html<'a> {
         self.body = Some(body);
         Html {
             head: self.head,
@@ -105,9 +110,9 @@ mod tests {
 
     #[test]
     fn ok_on_build_html() {
-        let title = HeadItem::new("<title>It works!</title>");
-        let style = Style::new("body { color: #000000; }");
-        let script1 = Script::new(
+        let title = HtmlHeadItem::new("<title>It works!</title>");
+        let style = HtmlStyle::new("body { color: #000000; }");
+        let script1 = HtmlScript::new(
             format!(
                 r#"console.log("Hello from file {} at line {}")"#,
                 file!(),
@@ -116,8 +121,8 @@ mod tests {
             .as_str(),
         );
 
-        let body = Body::new().script(script1);
-        let script2 = Script::new(
+        let body = HtmlBody::new().script(script1);
+        let script2 = HtmlScript::new(
             format!(
                 r#"console.log("Hello from file {} at line {}")"#,
                 file!(),

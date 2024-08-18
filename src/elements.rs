@@ -1,5 +1,9 @@
+mod body;
 mod div;
+mod head;
 mod p;
+mod script;
+mod style;
 mod text;
 
 use std::{
@@ -7,11 +11,19 @@ use std::{
     fmt::{Debug, Display},
 };
 
-pub use self::{div::Div, p::P, text::TextContent};
+pub use self::{
+    body::Body, div::Div, head::Head, p::P, script::Script, style::Style, text::TextContent,
+};
 
 use crate::{tags::Tag, OUTPUT_IDENTATION};
 
-pub trait ElementName: Debug {}
+pub trait ElementName: Debug {
+    fn name(&self) -> &'static str;
+}
+
+pub trait ElementBuilder<'a> {
+    fn builder() -> HtmlElement<'a>;
+}
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum HtmlElementChildren<'a> {
@@ -49,7 +61,7 @@ impl Display for HtmlElement<'_> {
         let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
 
         let tagname_and_attrs = format!("{}", self.tag);
-        let tag_name = &self.tag.name;
+        let tag_name = &self.tag.element.name();
 
         match &self.children {
             Some(children) => {
@@ -82,7 +94,7 @@ impl<'a> HtmlElement<'a> {
     pub fn builder(tag: Tag<'a>) -> HtmlElement<'a> {
         HtmlElement {
             tag,
-            // It exists from Body(depth=2)
+            // It exists from HtmlBody(depth=2)
             depth: 2,
             children: Default::default(),
         }

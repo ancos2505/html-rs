@@ -1,12 +1,12 @@
 use html_rs::{
-    elements::{Div, TextContent, P},
-    Body, HeadItem, Html, Script, Style,
+    elements::{Div, ElementBuilder, TextContent, P},
+    Html, HtmlBody, HtmlHeadItem, HtmlScript, HtmlStyle,
 };
 
 fn main() {
-    let title = HeadItem::new("<title>It works!</title>");
-    let style = Style::new("body { color: #000000; }");
-    let script1 = Script::new(
+    let title = HtmlHeadItem::new("<title>It works!</title>");
+    let style = HtmlStyle::new("body { color: #000000; }");
+    let script1 = HtmlScript::new(
         format!(
             r#"console.log("Hello from file {} at line {}")"#,
             file!(),
@@ -21,9 +21,9 @@ fn main() {
             .append_child(TextContent::text("It Works!")),
     );
 
-    let body = Body::new().script(script1).append_child(div);
+    let body = HtmlBody::new().script(script1).append_child(div);
 
-    let script2 = Script::new(
+    let script2 = HtmlScript::new(
         format!(
             r#"console.log("Hello from file {} at line {}")"#,
             file!(),

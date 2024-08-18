@@ -3,14 +3,14 @@ use crate::tags::Tag;
 use super::{ElementBuilder, ElementName, HtmlElement};
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct P;
-impl ElementName for P {
+pub struct Body;
+impl ElementName for Body {
     fn name(&self) -> &'static str {
-        "p"
+        "body"
     }
 }
 
-impl<'a> ElementBuilder<'a> for P {
+impl<'a> ElementBuilder<'a> for Body {
     fn builder() -> HtmlElement<'a> {
         let tag = Tag {
             element: Box::new(Self),

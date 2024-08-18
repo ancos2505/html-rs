@@ -1,17 +1,17 @@
 use std::{borrow::Cow, fmt::Display};
 
-use crate::OUTPUT_IDENTATION;
+use crate::{elements::Script, OUTPUT_IDENTATION};
 
 use super::Tag;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct Script<'a> {
+pub struct HtmlScript<'a> {
     tag: Tag<'a>,
     depth: usize,
     contents: Cow<'a, str>,
 }
 
-impl Display for Script<'_> {
+impl Display for HtmlScript<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut output = "".to_owned();
         let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
@@ -19,19 +19,16 @@ impl Display for Script<'_> {
 
         output.push_str(&self.contents);
 
-        output.push_str(format!("\n{iden}</{}>", self.tag.name).as_str());
+        output.push_str(format!("\n{iden}</{}>", self.tag.element.name()).as_str());
         write!(f, "{output}")
     }
 }
 
-impl<'a> Script<'a> {
-    pub const fn as_str() -> &'static str {
-        "script"
-    }
-    pub fn new<S: AsRef<str>>(script: S) -> Script<'a> {
+impl<'a> HtmlScript<'a> {
+    pub fn new<S: AsRef<str>>(script: S) -> HtmlScript<'a> {
         Self {
             tag: Tag {
-                name: Self::as_str().into(),
+                element: Box::new(Script),
                 attrs: Default::default(),
             },
             depth: 1,
@@ -40,8 +37,8 @@ impl<'a> Script<'a> {
     }
 }
 
-pub fn script<'a, S: AsRef<str>>(script: S) -> Script<'a> {
-    Script::new(script)
+pub fn script<'a, S: AsRef<str>>(script: S) -> HtmlScript<'a> {
+    HtmlScript::new(script)
 }
 
 #[cfg(test)]

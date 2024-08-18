@@ -4,24 +4,38 @@ mod html;
 mod script;
 mod style;
 
-use std::{borrow::Cow, fmt::Display};
-
-pub use self::{
-    body::Body,
-    head::{Head, HeadItem},
-    html::Html,
-    script::Script,
-    style::Style,
+use std::{
+    borrow::Cow,
+    fmt::{Debug, Display},
 };
 
-#[derive(Debug, PartialEq, Eq)]
+use crate::elements::ElementName;
+
+pub use self::{
+    body::HtmlBody,
+    head::{HtmlHead, HtmlHeadItem},
+    html::Html,
+    script::HtmlScript,
+    style::HtmlStyle,
+};
+
+#[derive(Debug)]
 pub struct Tag<'a> {
-    pub name: Cow<'a, str>,
+    pub element: Box<dyn ElementName>,
     pub attrs: Vec<TagAttribute<'a>>,
 }
+
+impl PartialEq for Tag<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        self.element.name() == other.element.name() && self.attrs == other.attrs
+    }
+}
+
+impl Eq for Tag<'_> {}
+
 impl Display for Tag<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut output = format!("{}", self.name);
+        let mut output = format!("{}", self.element.name());
         let max_idx = self.attrs.len();
         if max_idx > 0 {
             output.push(' ');

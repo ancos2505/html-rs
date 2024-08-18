@@ -1,6 +1,6 @@
 # html-rs
 
-Generate HTML code using Rust builders
+Generate HTML code using Rust builders with no dependencies (WIP) 
 
 ## Getting started
 

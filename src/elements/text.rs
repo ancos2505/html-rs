@@ -1,17 +1,28 @@
 use crate::tags::Tag;
 
-use super::HtmlElement;
+use super::{ElementBuilder, ElementName, HtmlElement};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct TextContent;
 
 impl<'a> TextContent {
     pub fn text<S: AsRef<str>>(text: S) -> HtmlElement<'a> {
+        Self::builder().text(text.as_ref())
+    }
+}
+
+impl ElementName for TextContent {
+    fn name(&self) -> &'static str {
+        ""
+    }
+}
+
+impl<'a> ElementBuilder<'a> for TextContent {
+    fn builder() -> HtmlElement<'a> {
         let tag = Tag {
-            name: "".into(),
+            element: Box::new(Self),
             attrs: Default::default(),
         };
-        let text_content = HtmlElement::builder(tag).text(text);
-        text_content
+        HtmlElement::builder(tag)
     }
 }

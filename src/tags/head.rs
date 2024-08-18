@@ -1,20 +1,20 @@
 use std::{borrow::Cow, fmt::Display};
 
-use crate::OUTPUT_IDENTATION;
+use crate::{elements::Head, OUTPUT_IDENTATION};
 
 use super::Tag;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct Head<'a> {
+pub struct HtmlHead<'a> {
     pub tag: Tag<'a>,
     pub depth: usize,
-    pub items: Vec<HeadItem<'a>>,
+    pub items: Vec<HtmlHeadItem<'a>>,
 }
-impl Default for Head<'_> {
+impl Default for HtmlHead<'_> {
     fn default() -> Self {
         Self {
             tag: Tag {
-                name: Self::as_str().into(),
+                element: Box::new(Head),
                 attrs: Default::default(),
             },
             depth: 1,
@@ -22,7 +22,7 @@ impl Default for Head<'_> {
         }
     }
 }
-impl Display for Head<'_> {
+impl Display for HtmlHead<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut output = "".to_owned();
         let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
@@ -30,19 +30,19 @@ impl Display for Head<'_> {
         for item in &self.items {
             output.push_str(format!("\n{}", item).as_str());
         }
-        output.push_str(format!("\n{iden}</{}>", self.tag.name).as_str());
+        output.push_str(format!("\n{iden}</{}>", self.tag.element.name()).as_str());
         write!(f, "{output}")
     }
 }
 
-impl<'a> Head<'a> {
+impl<'a> HtmlHead<'a> {
     pub const fn as_str() -> &'static str {
         "head"
     }
-    pub fn new() -> Head<'a> {
+    pub fn new() -> HtmlHead<'a> {
         Default::default()
     }
-    pub fn add(mut self, tag: HeadItem<'a>) -> Head<'a> {
+    pub fn add(mut self, tag: HtmlHeadItem<'a>) -> HtmlHead<'a> {
         self.items.push(tag);
         Self {
             tag: self.tag,
@@ -53,12 +53,12 @@ impl<'a> Head<'a> {
 }
 
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct HeadItem<'a> {
+pub struct HtmlHeadItem<'a> {
     depth: usize,
     contents: Cow<'a, str>,
 }
 
-impl Display for HeadItem<'_> {
+impl Display for HtmlHeadItem<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut output = "".to_string();
         let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
@@ -67,8 +67,8 @@ impl Display for HeadItem<'_> {
     }
 }
 
-impl<'a> HeadItem<'a> {
-    pub fn new<S: AsRef<str>>(tag_str: S) -> HeadItem<'a> {
+impl<'a> HtmlHeadItem<'a> {
+    pub fn new<S: AsRef<str>>(tag_str: S) -> HtmlHeadItem<'a> {
         Self {
             depth: 2,
             contents: Cow::from(tag_str.as_ref().to_owned()),
@@ -76,8 +76,8 @@ impl<'a> HeadItem<'a> {
     }
 }
 
-pub fn head<'a>() -> Head<'a> {
-    Head::new()
+pub fn head<'a>() -> HtmlHead<'a> {
+    HtmlHead::new()
 }
 
 #[cfg(test)]
@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn ok_on_build_simple_head() {
-        let tag = HeadItem::new("<title>Some title</title>");
+        let tag = HtmlHeadItem::new("<title>Some title</title>");
         let head = head().add(tag);
 
         //dbg!(&head);

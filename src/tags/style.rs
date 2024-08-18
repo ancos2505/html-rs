@@ -1,17 +1,17 @@
 use std::{borrow::Cow, fmt::Display};
 
-use crate::OUTPUT_IDENTATION;
+use crate::{elements::Style, OUTPUT_IDENTATION};
 
 use super::Tag;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct Style<'a> {
+pub struct HtmlStyle<'a> {
     tag: Tag<'a>,
     depth: usize,
     contents: Cow<'a, str>,
 }
 
-impl Display for Style<'_> {
+impl Display for HtmlStyle<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut output = "".to_owned();
         let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
@@ -19,19 +19,16 @@ impl Display for Style<'_> {
 
         output.push_str(&self.contents);
 
-        output.push_str(format!("\n{iden}</{}>", self.tag.name).as_str());
+        output.push_str(format!("\n{iden}</{}>", self.tag.element.name()).as_str());
         write!(f, "{output}")
     }
 }
 
-impl<'a> Style<'a> {
-    pub const fn as_str() -> &'static str {
-        "style"
-    }
-    pub fn new<S: AsRef<str>>(css: S) -> Style<'a> {
+impl<'a> HtmlStyle<'a> {
+    pub fn new<S: AsRef<str>>(css: S) -> HtmlStyle<'a> {
         Self {
             tag: Tag {
-                name: Self::as_str().into(),
+                element: Box::new(Style),
                 attrs: Default::default(),
             },
             depth: 1,
@@ -40,8 +37,8 @@ impl<'a> Style<'a> {
     }
 }
 
-pub fn style<'a, S: AsRef<str>>(css: S) -> Style<'a> {
-    Style::new(css)
+pub fn style<'a, S: AsRef<str>>(css: S) -> HtmlStyle<'a> {
+    HtmlStyle::new(css)
 }
 
 #[cfg(test)]

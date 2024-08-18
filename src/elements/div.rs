@@ -1,19 +1,19 @@
 use crate::tags::Tag;
 
-use super::HtmlElement;
+use super::{ElementBuilder, ElementName, HtmlElement};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Div;
-impl Div {
-    pub const fn as_str() -> &'static str {
+impl ElementName for Div {
+    fn name(&self) -> &'static str {
         "div"
     }
 }
 
-impl<'a> Div {
-    pub fn builder() -> HtmlElement<'a> {
+impl<'a> ElementBuilder<'a> for Div {
+    fn builder() -> HtmlElement<'a> {
         let tag = Tag {
-            name: Self::as_str().into(),
+            element: Box::new(Self),
             attrs: Default::default(),
         };
         HtmlElement::builder(tag)
