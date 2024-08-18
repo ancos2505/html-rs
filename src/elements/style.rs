@@ -1,4 +1,4 @@
-use crate::tags::Tag;
+use crate::Tag;
 
 use super::{ElementBuilder, ElementName, HtmlElement};
 

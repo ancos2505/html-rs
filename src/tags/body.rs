@@ -7,7 +7,7 @@ use crate::{
 
 use super::{script::HtmlScript, Tag};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct HtmlBody<'a> {
     tag: Tag<'a>,
     depth: usize,
@@ -34,7 +34,7 @@ impl Display for HtmlBody<'_> {
         let mut output = "".to_owned();
         let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
         output.push_str(format!("\n{iden}<{}>", self.tag).as_str());
-        for elem in &self.elements {
+        for elem in self.elements.iter() {
             output.push_str(format!("{iden}{}", elem).as_str());
         }
         output.push_str(format!("\n{iden}</{}>", self.tag.element.name()).as_str());

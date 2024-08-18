@@ -11,7 +11,7 @@ pub fn html<'a>() -> Html<'a> {
     Html::new()
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default)]
 pub struct Html<'a> {
     head: HtmlHead<'a>,
     styles: Vec<HtmlStyle<'a>>,
