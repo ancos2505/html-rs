@@ -6,7 +6,7 @@ use super::Tag;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct HtmlHead<'a> {
-    pub tag: Tag<'a>,
+    pub tag: Tag,
     pub depth: usize,
     pub items: Vec<HtmlHeadItem<'a>>,
 }

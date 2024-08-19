@@ -174,7 +174,7 @@ impl Display for HtmlElementChildren<'_> {
 
 #[derive(Debug)]
 pub struct HtmlElement<'a> {
-    pub tag: Tag<'a>,
+    pub tag: Tag,
     depth: usize,
     pub children: Option<HtmlElementChildren<'a>>,
 }
@@ -215,7 +215,7 @@ impl PartialEq for HtmlElement<'_> {
 
 impl Eq for HtmlElement<'_> {}
 impl<'a> HtmlElement<'a> {
-    pub fn builder(tag: Tag<'a>) -> HtmlElement<'a> {
+    pub fn builder(tag: Tag) -> HtmlElement<'a> {
         HtmlElement {
             tag,
             // It exists from HtmlBody(depth=2)

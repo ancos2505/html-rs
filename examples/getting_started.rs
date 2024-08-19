@@ -21,7 +21,10 @@ fn main() {
             .append_child(TextContent::text("It Works!")),
     );
 
-    let body = HtmlBody::new().script(script1).append_child(div);
+    let body = HtmlBody::new()
+        .set_attr("lang", "en")
+        .script(script1)
+        .append_child(div);
 
     let script2 = HtmlScript::new(
         format!(

@@ -5,7 +5,7 @@ mod script;
 mod style;
 
 use std::{
-    borrow::Cow,
+    collections::BTreeMap,
     fmt::{Debug, Display},
 };
 
@@ -20,28 +20,28 @@ pub use self::{
 };
 
 #[derive(Debug)]
-pub struct Tag<'a> {
+pub struct Tag {
     pub element: Box<dyn ElementName>,
-    pub attrs: Vec<TagAttribute<'a>>,
+    pub attrs: BTreeMap<String, String>,
 }
 
-impl PartialEq for Tag<'_> {
+impl PartialEq for Tag {
     fn eq(&self, other: &Self) -> bool {
         self.element.name() == other.element.name() && self.attrs == other.attrs
     }
 }
 
-impl Eq for Tag<'_> {}
+impl Eq for Tag {}
 
-impl Display for Tag<'_> {
+impl Display for Tag {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut output = format!("{}", self.element.name());
         let max_idx = self.attrs.len();
         if max_idx > 0 {
             output.push(' ');
         }
-        for (idx, attr) in self.attrs.iter().enumerate() {
-            output.push_str(format!("{attr}").as_str());
+        for (idx, (name, value)) in self.attrs.iter().enumerate() {
+            output.push_str(format!(r#"{name}="{value}""#).as_str());
             if idx + 1 < max_idx {
                 output.push(' ')
             }
@@ -49,33 +49,34 @@ impl Display for Tag<'_> {
         write!(f, "{output}")
     }
 }
-impl Tag<'_> {
+impl Tag {
     pub fn set_attr<K: AsRef<str>, V: AsRef<str>>(&mut self, key: K, value: V) {
-        let attr = TagAttribute::from((key.as_ref().to_owned(), value.as_ref().to_owned()));
-        self.attrs.push(attr);
+        let _b = self
+            .attrs
+            .insert(key.as_ref().to_owned(), value.as_ref().to_owned());
     }
 }
-#[derive(Debug, PartialEq, Eq)]
-pub struct TagAttribute<'a> {
-    // TODO
-    pub name: Cow<'a, str>,
-    pub value: String,
-}
-impl Display for TagAttribute<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let output = format!(r#"{}="{}""#, self.name, self.value);
-        write!(f, "{output}")
-    }
-}
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TagAttribute<'a> {
+//     // TODO
+//     pub name: Cow<'a, str>,
+//     pub value: String,
+// }
+// impl Display for TagAttribute<'_> {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//         let output = format!(r#"{}="{}""#, self.name, self.value);
+//         write!(f, "{output}")
+//     }
+// }
 
-impl From<(String, String)> for TagAttribute<'_> {
-    fn from((key, value): (String, String)) -> Self {
-        TagAttribute {
-            name: key.into(),
-            value,
-        }
-    }
-}
+// impl From<(String, String)> for TagAttribute<'_> {
+//     fn from((key, value): (String, String)) -> Self {
+//         TagAttribute {
+//             name: key.into(),
+//             value,
+//         }
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

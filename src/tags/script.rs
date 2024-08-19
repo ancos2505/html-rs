@@ -6,7 +6,7 @@ use super::Tag;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct HtmlScript<'a> {
-    tag: Tag<'a>,
+    tag: Tag,
     depth: usize,
     contents: Cow<'a, str>,
 }

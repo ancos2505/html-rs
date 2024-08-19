@@ -9,7 +9,7 @@ use super::{script::HtmlScript, Tag};
 
 #[derive(Debug)]
 pub struct HtmlBody<'a> {
-    tag: Tag<'a>,
+    tag: Tag,
     depth: usize,
     elements: Vec<HtmlElement<'a>>,
     script: Vec<HtmlScript<'a>>,
@@ -62,6 +62,15 @@ impl<'a> HtmlBody<'a> {
     pub fn append_child(mut self, mut element: HtmlElement<'a>) -> HtmlBody<'a> {
         element.set_depth(self.depth + 1);
         self.elements.push(element);
+        HtmlBody {
+            tag: self.tag,
+            depth: self.depth,
+            script: self.script,
+            elements: self.elements,
+        }
+    }
+    pub fn set_attr<K: AsRef<str>, V: AsRef<str>>(mut self, key: K, value: V) -> HtmlBody<'a> {
+        self.tag.set_attr(key, value);
         HtmlBody {
             tag: self.tag,
             depth: self.depth,
