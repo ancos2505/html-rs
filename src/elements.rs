@@ -208,8 +208,6 @@ impl Display for HtmlElement<'_> {
 impl PartialEq for HtmlElement<'_> {
     fn eq(&self, other: &Self) -> bool {
         self.tag == other.tag && self.depth == other.depth && self.children == other.children
-        // TODO
-        // && self.token == other.token
     }
 }
 
@@ -245,7 +243,7 @@ impl<'a> HtmlElement<'a> {
     }
     pub fn append_child(self, mut new_element: HtmlElement<'a>) -> HtmlElement<'a> {
         new_element.depth = self.depth + 1;
-        dbg!(&new_element);
+        // dbg!(&new_element);
         if let Some(children) = self.children {
             let new_children = match children {
                 HtmlElementChildren::TextContent(text) => {

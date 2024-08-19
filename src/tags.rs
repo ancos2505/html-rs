@@ -56,27 +56,6 @@ impl Tag {
             .insert(key.as_ref().to_owned(), value.as_ref().to_owned());
     }
 }
-// #[derive(Debug, PartialEq, Eq)]
-// pub struct TagAttribute<'a> {
-//     // TODO
-//     pub name: Cow<'a, str>,
-//     pub value: String,
-// }
-// impl Display for TagAttribute<'_> {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         let output = format!(r#"{}="{}""#, self.name, self.value);
-//         write!(f, "{output}")
-//     }
-// }
-
-// impl From<(String, String)> for TagAttribute<'_> {
-//     fn from((key, value): (String, String)) -> Self {
-//         TagAttribute {
-//             name: key.into(),
-//             value,
-//         }
-//     }
-// }
 
 #[cfg(test)]
 mod tests {
