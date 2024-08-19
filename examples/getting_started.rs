@@ -1,10 +1,10 @@
 use html_rs::{
-    elements::{Div, ElementBuilder, TextContent, P},
-    Html, HtmlBody, HtmlHeadItem, HtmlScript, HtmlStyle,
+    elements::{Div, ElementBuilder, TextContent, Title, P},
+    Html, HtmlBody, HtmlScript, HtmlStyle,
 };
 
 fn main() {
-    let title = HtmlHeadItem::new("<title>It works!</title>");
+    let title = Title::builder().append_child(TextContent::builder().text("It works!"));
     let style = HtmlStyle::new("body { color: #000000; }");
     let script1 = HtmlScript::new(
         format!(

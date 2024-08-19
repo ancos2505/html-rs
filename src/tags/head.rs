@@ -1,6 +1,9 @@
-use std::{borrow::Cow, fmt::Display};
+use std::fmt::Display;
 
-use crate::{elements::Head, OUTPUT_IDENTATION};
+use crate::{
+    elements::{Head, HtmlElement},
+    OUTPUT_IDENTATION,
+};
 
 use super::Tag;
 
@@ -8,7 +11,7 @@ use super::Tag;
 pub struct HtmlHead<'a> {
     pub tag: Tag,
     pub depth: usize,
-    pub items: Vec<HtmlHeadItem<'a>>,
+    pub items: Vec<HtmlElement<'a>>,
 }
 impl Default for HtmlHead<'_> {
     fn default() -> Self {
@@ -28,7 +31,7 @@ impl Display for HtmlHead<'_> {
         let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
         output.push_str(format!("\n{iden}<{}>", self.tag).as_str());
         for item in &self.items {
-            output.push_str(format!("\n{}", item).as_str());
+            output.push_str(format!("{}", item).as_str());
         }
         output.push_str(format!("\n{iden}</{}>", self.tag.element.name()).as_str());
         write!(f, "{output}")
@@ -42,36 +45,12 @@ impl<'a> HtmlHead<'a> {
     pub fn new() -> HtmlHead<'a> {
         Default::default()
     }
-    pub fn add(mut self, tag: HtmlHeadItem<'a>) -> HtmlHead<'a> {
-        self.items.push(tag);
+    pub fn add(mut self, tag: HtmlElement<'a>) -> HtmlHead<'a> {
+        self.items.push(tag.into());
         Self {
             tag: self.tag,
             depth: self.depth,
             items: self.items,
-        }
-    }
-}
-
-#[derive(Debug, Default, PartialEq, Eq)]
-pub struct HtmlHeadItem<'a> {
-    depth: usize,
-    contents: Cow<'a, str>,
-}
-
-impl Display for HtmlHeadItem<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut output = "".to_string();
-        let iden = " ".repeat(OUTPUT_IDENTATION * self.depth);
-        output.push_str(format!("{iden}{}", self.contents).as_str());
-        write!(f, "{output}")
-    }
-}
-
-impl<'a> HtmlHeadItem<'a> {
-    pub fn new<S: AsRef<str>>(tag_str: S) -> HtmlHeadItem<'a> {
-        Self {
-            depth: 2,
-            contents: Cow::from(tag_str.as_ref().to_owned()),
         }
     }
 }
@@ -83,11 +62,14 @@ pub fn head<'a>() -> HtmlHead<'a> {
 #[cfg(test)]
 mod tests {
 
+    use crate::elements::Title;
+
     use super::*;
 
     #[test]
     fn ok_on_build_simple_head() {
-        let tag = HtmlHeadItem::new("<title>Some title</title>");
+        use crate::elements::ElementBuilder;
+        let tag = Title::builder().text("Some title");
         let head = head().add(tag);
 
         //dbg!(&head);

@@ -11,13 +11,7 @@ use std::{
 
 use crate::elements::ElementName;
 
-pub use self::{
-    body::HtmlBody,
-    head::{HtmlHead, HtmlHeadItem},
-    html::Html,
-    script::HtmlScript,
-    style::HtmlStyle,
-};
+pub use self::{body::HtmlBody, head::HtmlHead, html::Html, script::HtmlScript, style::HtmlStyle};
 
 #[derive(Debug)]
 pub struct Tag {

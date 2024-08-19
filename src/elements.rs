@@ -221,6 +221,7 @@ impl<'a> HtmlElement<'a> {
             children: Default::default(),
         }
     }
+    /// ## Attention: Only use in TextContent
     pub fn text<S: AsRef<str>>(mut self, text: S) -> HtmlElement<'a> {
         self.children = Some(HtmlElementChildren::TextContent(
             text.as_ref().to_owned().into(),

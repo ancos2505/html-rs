@@ -1,11 +1,8 @@
 use std::fmt::Display;
 
-use super::{
-    body::HtmlBody,
-    head::{HtmlHead, HtmlHeadItem},
-    script::HtmlScript,
-    style::HtmlStyle,
-};
+use crate::elements::HtmlElement;
+
+use super::{body::HtmlBody, head::HtmlHead, script::HtmlScript, style::HtmlStyle};
 
 pub fn html<'a>() -> Html<'a> {
     Html::new()
@@ -60,8 +57,8 @@ impl<'a> Html<'a> {
     pub fn new() -> Html<'a> {
         Default::default()
     }
-    pub fn head(mut self, head: HtmlHeadItem<'a>) -> Html<'a> {
-        self.head.items.push(head);
+    pub fn head(mut self, head: HtmlElement<'a>) -> Html<'a> {
+        self.head.items.push(head.into());
         Html {
             head: self.head,
             styles: self.styles,
@@ -110,7 +107,8 @@ mod tests {
 
     #[test]
     fn ok_on_build_html() {
-        let title = HtmlHeadItem::new("<title>It works!</title>");
+        use crate::elements::{ElementBuilder, Title};
+        let title = Title::builder().text("It works!");
         let style = HtmlStyle::new("body { color: #000000; }");
         let script1 = HtmlScript::new(
             format!(
