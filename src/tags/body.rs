@@ -42,12 +42,8 @@ impl Display for HtmlBody<'_> {
     }
 }
 
-pub fn body<'a>() -> HtmlBody<'a> {
-    HtmlBody::new()
-}
-
 impl<'a> HtmlBody<'a> {
-    pub fn new() -> HtmlBody<'a> {
+    pub fn builder() -> HtmlBody<'a> {
         Default::default()
     }
     pub fn script(mut self, script: HtmlScript<'a>) -> HtmlBody<'a> {
@@ -86,7 +82,7 @@ mod tests {
 
     #[test]
     fn ok_on_build_simple_body() {
-        let body = body().script(
+        let body = HtmlBody::builder().script(
             HtmlScript::new(format!(
                 r#"console.log("Hello from file {} at line {}")"#,
                 file!(),

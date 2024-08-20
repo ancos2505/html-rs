@@ -42,7 +42,7 @@ impl<'a> HtmlHead<'a> {
     pub const fn as_str() -> &'static str {
         "head"
     }
-    pub fn new() -> HtmlHead<'a> {
+    pub fn builder() -> HtmlHead<'a> {
         Default::default()
     }
     pub fn add(mut self, tag: HtmlElement<'a>) -> HtmlHead<'a> {
@@ -55,22 +55,17 @@ impl<'a> HtmlHead<'a> {
     }
 }
 
-pub fn head<'a>() -> HtmlHead<'a> {
-    HtmlHead::new()
-}
-
 #[cfg(test)]
 mod tests {
 
-    use crate::elements::Title;
+    use crate::{elements::Title, Html};
 
     use super::*;
 
     #[test]
     fn ok_on_build_simple_head() {
-        use crate::elements::ElementBuilder;
-        let tag = Title::builder().text("Some title");
-        let head = head().add(tag);
+        let title = Title::text("Some title");
+        let head = Html::builder().head_item(title);
 
         //dbg!(&head);
         println!("{head}");

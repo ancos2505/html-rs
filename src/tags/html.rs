@@ -4,10 +4,6 @@ use crate::elements::HtmlElement;
 
 use super::{body::HtmlBody, head::HtmlHead, script::HtmlScript, style::HtmlStyle};
 
-pub fn html<'a>() -> Html<'a> {
-    Html::new()
-}
-
 #[derive(Debug, Default)]
 pub struct Html<'a> {
     head: HtmlHead<'a>,
@@ -54,11 +50,11 @@ impl Display for Html<'_> {
 }
 
 impl<'a> Html<'a> {
-    pub fn new() -> Html<'a> {
+    pub fn builder() -> Html<'a> {
         Default::default()
     }
-    pub fn head(mut self, head: HtmlElement<'a>) -> Html<'a> {
-        self.head.items.push(head.into());
+    pub fn head_item(mut self, elem: HtmlElement<'a>) -> Html<'a> {
+        self.head.items.push(elem.into());
         Html {
             head: self.head,
             styles: self.styles,
@@ -108,7 +104,7 @@ mod tests {
     #[test]
     fn ok_on_build_html() {
         use crate::elements::{ElementBuilder, Title};
-        let title = Title::builder().text("It works!");
+        let title = Title::text("It works!");
         let style = HtmlStyle::new("body { color: #000000; }");
         let script1 = HtmlScript::new(
             format!(
@@ -119,7 +115,7 @@ mod tests {
             .as_str(),
         );
 
-        let body = HtmlBody::new().script(script1);
+        let body = HtmlBody::builder().script(script1);
         let script2 = HtmlScript::new(
             format!(
                 r#"console.log("Hello from file {} at line {}")"#,
@@ -128,8 +124,8 @@ mod tests {
             )
             .as_str(),
         );
-        let html = html()
-            .head(title)
+        let html = Html::builder()
+            .head_item(title)
             .add_style(style)
             .add_script(script2)
             .body(body);

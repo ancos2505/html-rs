@@ -2,7 +2,7 @@
 edition = "2021"
 rust-version = "1.80.1"
 name = "html-rs"
-version = "0.2.0"
+version = "0.3.0"
 description = "Generate HTML code using Rust builders"
 readme = "README.md"
 keywords = ["html"]

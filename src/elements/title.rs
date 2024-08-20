@@ -4,6 +4,12 @@ use super::{ElementBuilder, ElementName, HtmlElement};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Title;
+impl<'a> Title {
+    pub fn text<S: AsRef<str>>(text: S) -> HtmlElement<'a> {
+        Self::builder().inner_text(text.as_ref())
+    }
+}
+
 impl ElementName for Title {
     fn name(&self) -> &'static str {
         "title"

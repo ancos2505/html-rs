@@ -4,7 +4,7 @@ use html_rs::{
 };
 
 fn main() {
-    let title = Title::builder().append_child(TextContent::builder().text("It works!"));
+    let title = Title::builder().append_child(TextContent::text("It works!"));
     let style = HtmlStyle::new("body { color: #000000; }");
     let script1 = HtmlScript::new(
         format!(
@@ -21,7 +21,7 @@ fn main() {
             .append_child(TextContent::text("It Works!")),
     );
 
-    let body = HtmlBody::new()
+    let body = HtmlBody::builder()
         .set_attr("lang", "en")
         .script(script1)
         .append_child(div);
@@ -34,8 +34,8 @@ fn main() {
         )
         .as_str(),
     );
-    let html = Html::new()
-        .head(title)
+    let html = Html::builder()
+        .head_item(title)
         .add_style(style)
         .add_script(script2)
         .body(body);

@@ -7,7 +7,7 @@ pub struct TextContent;
 
 impl<'a> TextContent {
     pub fn text<S: AsRef<str>>(text: S) -> HtmlElement<'a> {
-        Self::builder().text(text.as_ref())
+        Self::builder().inner_text(text.as_ref())
     }
 }
 

@@ -222,7 +222,7 @@ impl<'a> HtmlElement<'a> {
         }
     }
     /// ## Attention: Only use in TextContent
-    pub fn text<S: AsRef<str>>(mut self, text: S) -> HtmlElement<'a> {
+    pub fn inner_text<S: AsRef<str>>(mut self, text: S) -> HtmlElement<'a> {
         self.children = Some(HtmlElementChildren::TextContent(
             text.as_ref().to_owned().into(),
         ));
