@@ -20,5 +20,5 @@ cargo run --example getting_started --features debug
 ## How to add in your project
 
 ```
-cargo install h10 --git=https://github.com/ancos2505/html-rs.git
+cargo add --git=https://github.com/ancos2505/html-rs.git
 ```
