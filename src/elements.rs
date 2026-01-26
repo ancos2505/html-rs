@@ -199,7 +199,7 @@ impl Display for HtmlElement<'_> {
                     )
                 }
             }
-            None => output.push_str(format!("\n{iden}<{tagname_and_attrs}></{tag_name}>").as_str()),
+            None => output.push_str(format!("\n{iden}<{tagname_and_attrs} />").as_str()),
         };
 
         write!(f, "{output}")
